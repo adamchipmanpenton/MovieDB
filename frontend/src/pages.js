@@ -3,18 +3,49 @@ import ReactDOM from 'react-dom';
 import { useState, useEffect } from 'react';
 import './App.css';
 import {Link, useLocation} from "react-router-dom"
+import Emoji from 'a11y-react-emoji'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
+import Dropdown from "react-bootstrap/Dropdown"
 
 
 export function Home({movies, setMovies}) {
+    return (
+        <div className="App">
+            <Navbar bg="light" expand="lg">
+                <Container>
+                    <Navbar.Brand href="">Movie Reviews</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="viewMovies">See Reviews</Nav.Link>
+                        <Nav.Link href="addReview">Add Review</Nav.Link>
+                    </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+            <Container>
+                <h1>Home Page</h1>   
+                <h4>Welcome to Movie reviews.</h4>
+                <p>You can click on Add Review to leave a review of any movie you like. Then fill out the form to leave a 
+                    rating from 0 to 5 stars, the actors, year the movie was release and upload a picture 
+                    of the movie poster.<br></br>Click on See Reviews to view all movie reviews.
+                </p>  
+                <Emoji symbol="🎥" label="film"/>   
+                <Emoji symbol="🎬" label="clip"/> 
+                <Emoji symbol="🍿" label="popcorn"/> 
+            </Container>
+        </div>
+    );
+}
+
+export function ViewMovies({movies, setMovies}) {
     console.log(movies)
-
-
     function handleRemove(name) {
         console.log(name)
         const remove = async () => {
@@ -30,31 +61,44 @@ export function Home({movies, setMovies}) {
         remove();
         setMovies()
       }
+
+    function emjoi(rating){
+        if(rating == "0"){
+            return <Emoji symbol="💩" label="pile of poo"/>
+        }else if(rating == "1"){
+            return <Emoji symbol="⭐" label="star"/>
+        }else if(rating == "2"){
+            return <Emoji symbol="⭐⭐" label="star" />
+        }else if(rating == "3"){
+            return <Emoji symbol="⭐⭐⭐" label="star" />
+        }else if(rating == "4"){
+            return <Emoji symbol="⭐⭐⭐⭐" label="star" />
+        }else if(rating == "5"){
+            return <Emoji symbol="🌟🌟🌟🌟🌟" label="	glowingStar" />
+        }
+    }
     return (
         <div className="App">
             <Navbar bg="light" expand="lg">
                 <Container>
-                    <Navbar.Brand href="addReview">Movie Reviews</Navbar.Brand>
+                    <Navbar.Brand href="">Movie Reviews</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="/">See Reviews</Nav.Link>
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="viewMovies">See Reviews</Nav.Link>
                         <Nav.Link href="addReview">Add Review</Nav.Link>
-                        
                     </Nav>
                     </Navbar.Collapse>
                 </Container>
-            </Navbar>
-            <nav>
-                <Link to="addReview">Add a Review</Link>
-            </nav>
-            <h1>Star Wars Reviews</h1>
+            </Navbar>           
+            <h1>Movie Reviews</h1>
             { movies.map( (movie) => (
                 <><h2>{movie.name}</h2>
                 <img src={"./images/" + movie.poster} />
                 <p>Release Date: {movie.date}</p>
                 <p>Main Actors: {movie.actors}</p>
-                <p>Rating: {movie.rating}</p>
+                <p>Rating: {emjoi(movie.rating)}</p>
                 <button className="delete" onClick={() => handleRemove(movie.name)}>Delete</button>
                 <br></br></>
             ))}           
@@ -66,7 +110,7 @@ export function AddReview({movies, setMovies}) {
     const [movieName, setMovieName] = useState("The Phantom Menace");
     const [releaseDate, setReleaseDate] = useState("");
     const [actors, setActors] = useState([""]);
-    const [movieRating, setMovieRating] = useState("1");
+    const [movieRating, setMovieRating] = useState("0");
     let poster = "swep1.jpg"
     const handleSubmit = (event) => {
         if (movieName == "The Phantom Menace"){
@@ -129,20 +173,17 @@ export function AddReview({movies, setMovies}) {
         <div className="App">
             <Navbar bg="light" expand="lg">
                 <Container>
-                    <Navbar.Brand href="addReview">Movie Reviews</Navbar.Brand>
+                    <Navbar.Brand href="">Movie Reviews</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="/">See Reviews</Nav.Link>
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="viewMovies">See Reviews</Nav.Link>
                         <Nav.Link href="addReview">Add Review</Nav.Link>
-                        
                     </Nav>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <nav>
-                <Link to="/">View All Reviews</Link>
-            </nav>
             <h1>Add a Star Wars Review</h1>
             <p>Choose the Star Wars movie you wish to review and fill out the rest of the information.<br/>You can then see it under all reviews.</p>
             <form onSubmit={handleSubmit}>
@@ -176,13 +217,28 @@ export function AddReview({movies, setMovies}) {
                 <label>
                     Rating:
                     <select value={movieRating} onChange={handleChangeRating}>
-                        <option selected value="1">1</option>
+                        <option selected value="0">0</option>
+                        <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4">4</option>
                         <option value="5">5</option>
                     </select>
                 </label>
+                <Dropdown>
+                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                        Rating:
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item value="0">0</Dropdown.Item>
+                        <Dropdown.Item value="1">1</Dropdown.Item>
+                        <Dropdown.Item value="2">2</Dropdown.Item>
+                        <Dropdown.Item value="3">3</Dropdown.Item>
+                        <Dropdown.Item value="4">4</Dropdown.Item>
+                        <Dropdown.Item value="5">5</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
                 <br/>
                 <input type="submit" value="Submit" />
             </form>
