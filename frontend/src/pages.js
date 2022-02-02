@@ -11,6 +11,16 @@ import Image from 'react-bootstrap/Image'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import Dropdown from "react-bootstrap/Dropdown"
+import Card from 'react-bootstrap/Card'
+import InputGroup from "react-bootstrap/InputGroup"
+import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
+import CardGroup from 'react-bootstrap/CardGroup'
+import FormControl from "react-bootstrap/FormControl"
+import FormGroup from "react-bootstrap/esm/FormGroup";
+
+
+
 
 
 export function Home({movies, setMovies}) {
@@ -29,13 +39,19 @@ export function Home({movies, setMovies}) {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Container>
+            <Container className="text-center" Style={{ padding:"20px"}}>
+            <Row style={{ padding:"25px"}}>
                 <h1>Home Page</h1>   
+            </Row>
+            <Row style={{ padding:"10px"}}>
                 <h4>Welcome to Movie reviews.</h4>
+            </Row>    
+            <Row>
                 <p>You can click on Add Review to leave a review of any movie you like. Then fill out the form to leave a 
                     rating from 0 to 5 stars, the actors, year the movie was release and upload a picture 
                     of the movie poster.<br></br>Click on See Reviews to view all movie reviews.
-                </p>  
+                </p> 
+            </Row>
                 <Emoji symbol="🎥" label="film"/>   
                 <Emoji symbol="🎬" label="clip"/> 
                 <Emoji symbol="🍿" label="popcorn"/> 
@@ -46,7 +62,7 @@ export function Home({movies, setMovies}) {
 
 export function ViewMovies({movies, setMovies}) {
     console.log(movies)
-    function handleRemove(name) {
+    function handleRemove(name, event) {
         console.log(name)
         const remove = async () => {
             const result = await  fetch("/api/removeMovie",{
@@ -91,62 +107,73 @@ export function ViewMovies({movies, setMovies}) {
                     </Nav>
                     </Navbar.Collapse>
                 </Container>
-            </Navbar>           
-            <h1>Movie Reviews</h1>
+            </Navbar>    
+            <Container>
+                <Row className="text-center" style={{ padding:"25px"}}>
+                <h1>Movie Reviews</h1> 
+               </Row>
+            </Container>       
+            
+
+            <Row xs={1} md={3} className="g-4">
             { movies.map( (movie) => (
-                <><h2>{movie.name}</h2>
-                <img src={"./images/" + movie.poster} />
-                <p>Release Date: {movie.date}</p>
-                <p>Main Actors: {movie.actors}</p>
-                <p>Rating: {emjoi(movie.rating)}</p>
-                <button className="delete" onClick={() => handleRemove(movie.name)}>Delete</button>
-                <br></br></>
-            ))}           
+                <CardGroup>
+                    <Card>
+                        <Card.Img variant="top" src={"./images/" + movie.poster}  />
+                        <Card.Body>
+                        <Card.Title>{movie.name}</Card.Title>
+                        <Card.Text>
+                            <p>Release Date: {movie.date}</p>
+                            <p>Main Actors: {movie.actors}</p>
+                            <p>Rating: {emjoi(movie.rating)}</p>
+                        </Card.Text>
+                        </Card.Body>
+                        <Card.Footer>
+                            <Button variant="danger" className="delete" onClick={() => handleRemove(movie.name)}>Delete</Button>
+                        </Card.Footer>                
+                    </Card>
+                </CardGroup>
+              
+                
+            ))}   
+            </Row>        
         </div>
     );
 }
 
 export function AddReview({movies, setMovies}) {
-    const [movieName, setMovieName] = useState("The Phantom Menace");
-    const [releaseDate, setReleaseDate] = useState("");
-    const [actors, setActors] = useState([""]);
-    const [movieRating, setMovieRating] = useState("0");
-    let poster = "swep1.jpg"
+    
+
     const handleSubmit = (event) => {
-        if (movieName == "The Phantom Menace"){
-            poster = "swep1.jpg"
-        }else if(movieName == "Attack of the Clones"){
-            poster = "swep2.jpg"
-        }else if(movieName == "Revenge of the Sith"){
-            poster = "swep3.jpg"
-        }else if(movieName == "Solo: A Star Wars Story"){
-            poster = "swsolo.jpg"
-        }else if(movieName == "Rogue One"){
-            poster = "swrougeone.png"
-        }else if(movieName == "Star Wars"){
-            poster = "swep4.jpg"
-        }else if(movieName == "The Empire Strikes Back"){
-            poster = "swep5.jpg"
-        }else if(movieName == "Return of the Jedi"){
-            poster = "swep6.jpg"
-        }else if(movieName == "The Force Awakens"){
-            poster = "swep7.jpg"
-        }else if(movieName == "The Last Jedi"){
-            poster = "swep8.jpg"
-        }else if(movieName == "The Rise of Skywalker"){
-            poster = "swep9.jpg"
-        }
-        let newMovie = [
-            ...movies,{
-                "name" : movieName,
-                "date" : releaseDate,
-                "actors" : actors,
-                "poster" : poster,
-                "rating" : movieRating
-            }
-        ]
-      
+
+        console.log("Testdd")
+        console.log(document.getElementById("poster"))
+        
+        const movieName = document.getElementById("movieName").value
+        const releaseDate = document.getElementById("releaseDate").value
+        const actors = document.getElementById("actors").value
+        const movieRating = document.getElementById("movieRating").value
+        const poster = document.getElementById("poster")
+        console.log(poster.value)
+        const formData = new FormData();
+        formData.append("poster", poster);
+
+        console.log(formData.poster)
+        event.preventDefault();
+        
+        
+       
         const add = async () => {
+
+            const addPoster = await fetch("/api/addPoster", {
+                method: 'post',
+                body: formData
+            })
+                .then((res) => console.log(res))
+                .catch((err) => ("Error occured", err));
+
+            const body = await addPoster.json();
+
             const result = await  fetch('/api/addMovie',{
                 method: "POST",
                 body: JSON.stringify({name: movieName, date: releaseDate, actors: actors, poster: poster, rating: movieRating}),
@@ -159,15 +186,9 @@ export function AddReview({movies, setMovies}) {
         }
         add();
         console.log(`Movie name, ${movieName}, Relase date ${releaseDate}, actors ${actors}, poster ${poster}, rating ${movieRating}`) 
-        //event.preventDefault();        
+            
       }
 
-    const handleChangeName = (event) => {
-        setMovieName(event.target.value)
-    }
-    const handleChangeRating = (event) => {
-        setMovieRating(event.target.value)
-    }
      
     return (
         <div className="App">
@@ -184,64 +205,51 @@ export function AddReview({movies, setMovies}) {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <h1>Add a Star Wars Review</h1>
-            <p>Choose the Star Wars movie you wish to review and fill out the rest of the information.<br/>You can then see it under all reviews.</p>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Which Star Wars movie?
-                    <select value={movieName} onChange={handleChangeName}>
-                        <option selected value="The Phantom Menace">The Phantom Menace</option>
-                        <option value="Attack of the Clones">Attack of the Clones</option>
-                        <option value="Revenge of the Sith">Revenge of the Sith</option>
-                        <option value="Solo: A Star Wars Story">Solo: A Star Wars Story</option>
-                        <option value="Rogue One">Rogue One</option>
-                        <option value="Star Wars">Star Wars</option>
-                        <option value="The Empire Strikes Back">The Empire Strikes Back</option>
-                        <option value="Return of the Jedi">Return of the Jedi</option>
-                        <option value="The Force Awakens">The Force Awakens</option>
-                        <option value="The Last Jedi">The Last Jedi</option>
-                        <option value="The Rise of Skywalker">The Rise of Skywalker</option>
-                    </select>
-                </label>
-                <br/>
-                <label>
-                    Release Date:
-                    <input type="text" name="releaseDate" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)}/>
-                </label>
-                <br/>
-                <label>
-                    Main Actors:
-                    <input type="text" name="actors" value={actors} onChange={(e) => setActors(e.target.value)}/>
-                </label>
-                <br/>
-                <label>
-                    Rating:
-                    <select value={movieRating} onChange={handleChangeRating}>
-                        <option selected value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </label>
-                <Dropdown>
-                    <Dropdown.Toggle variant="light" id="dropdown-basic">
-                        Rating:
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                        <Dropdown.Item value="0">0</Dropdown.Item>
-                        <Dropdown.Item value="1">1</Dropdown.Item>
-                        <Dropdown.Item value="2">2</Dropdown.Item>
-                        <Dropdown.Item value="3">3</Dropdown.Item>
-                        <Dropdown.Item value="4">4</Dropdown.Item>
-                        <Dropdown.Item value="5">5</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-                <br/>
-                <input type="submit" value="Submit" />
-            </form>
+            <Container className="text-center">
+            <Row style={{ padding:"25px"}}>
+                <h1>Add a Star Wars Review</h1>
+            </Row>
+            
+            <p>Fill out the form below for the movie you wish to review. Then click submit.<br/>You can then see it under all reviews.</p>
+            </Container>
+            <Container >
+                <Form onSubmit={handleSubmit} >
+                    <Row className="mb-3">
+                        <FormGroup as={Col}>
+                            <Form.Label>Movie Name</Form.Label>
+                            <Form.Control type="text" id="movieName" required/>
+                        </FormGroup>
+                        <FormGroup as={Col}>
+                            <Form.Label>Release Date</Form.Label>
+                            <Form.Control type="text" id="releaseDate" required/>
+                        </FormGroup>
+                    </Row>
+                    <Row className="mb-3">
+                        <FormGroup as={Col} >
+                            <Form.Label>Actors</Form.Label>
+                            <Form.Control type="text" id="actors" required/>
+                        </FormGroup>
+                        <Col xs="auto">
+                            <Form.Label>Movie Rating</Form.Label>
+                            <Form.Select type="text" id="movieRating" required>
+                                <option>0</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                    <Form.Group controlId="formFile" className="mb-3">
+                        <Form.Label>Movie Poster</Form.Label>
+                        <Form.Control type="file" id="poster" required/>
+                    </Form.Group>
+                    <Button variant="primary" type="submit" >
+                        Submit
+                    </Button>
+                </Form>
+            </Container>
         </div>
     );
 };
