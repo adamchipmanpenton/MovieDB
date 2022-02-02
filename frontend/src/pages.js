@@ -19,10 +19,6 @@ import CardGroup from 'react-bootstrap/CardGroup'
 import FormControl from "react-bootstrap/FormControl"
 import FormGroup from "react-bootstrap/esm/FormGroup";
 
-
-
-
-
 export function Home({movies, setMovies}) {
     return (
         <div className="App">
@@ -62,6 +58,7 @@ export function Home({movies, setMovies}) {
 
 export function ViewMovies({movies, setMovies}) {
     console.log(movies)
+
     function handleRemove(name, event) {
         console.log(name)
         const remove = async () => {
@@ -75,7 +72,7 @@ export function ViewMovies({movies, setMovies}) {
             setMovies(body.movies)
         }
         remove();
-        setMovies()
+        window.location.reload(false);
       }
 
     function emjoi(rating){
@@ -113,8 +110,6 @@ export function ViewMovies({movies, setMovies}) {
                 <h1>Movie Reviews</h1> 
                </Row>
             </Container>       
-            
-
             <Row xs={1} md={3} className="g-4">
             { movies.map( (movie) => (
                 <CardGroup>
@@ -133,8 +128,6 @@ export function ViewMovies({movies, setMovies}) {
                         </Card.Footer>                
                     </Card>
                 </CardGroup>
-              
-                
             ))}   
             </Row>        
         </div>
@@ -142,54 +135,29 @@ export function ViewMovies({movies, setMovies}) {
 }
 
 export function AddReview({movies, setMovies}) {
-    
 
     const handleSubmit = (event) => {
-
-        console.log("Testdd")
         console.log(document.getElementById("poster"))
-        
         const movieName = document.getElementById("movieName").value
         const releaseDate = document.getElementById("releaseDate").value
         const actors = document.getElementById("actors").value
         const movieRating = document.getElementById("movieRating").value
-        const poster = document.getElementById("poster")
-        console.log(poster.value)
-        const formData = new FormData();
-        formData.append("poster", poster);
-
-        console.log(formData.poster)
-        event.preventDefault();
-        
-        
-       
+        const poster = "swep4.jpg"
+        {/*event.preventDefault();*/}
         const add = async () => {
-
-            const addPoster = await fetch("/api/addPoster", {
-                method: 'post',
-                body: formData
-            })
-                .then((res) => console.log(res))
-                .catch((err) => ("Error occured", err));
-
-            const body = await addPoster.json();
 
             const result = await  fetch('/api/addMovie',{
                 method: "POST",
                 body: JSON.stringify({name: movieName, date: releaseDate, actors: actors, poster: poster, rating: movieRating}),
                 headers:{"Content-Type": "application/json",}
             });
-    
             const body = await result.json();
             console.log(body);
             setMovies(body.movies)
         }
         add();
-        console.log(`Movie name, ${movieName}, Relase date ${releaseDate}, actors ${actors}, poster ${poster}, rating ${movieRating}`) 
-            
+        console.log(`Movie name, ${movieName}, Relase date ${releaseDate}, actors ${actors}, poster ${poster}, rating ${movieRating}`)  
       }
-
-     
     return (
         <div className="App">
             <Navbar bg="light" expand="lg">
@@ -209,8 +177,7 @@ export function AddReview({movies, setMovies}) {
             <Row style={{ padding:"25px"}}>
                 <h1>Add a Star Wars Review</h1>
             </Row>
-            
-            <p>Fill out the form below for the movie you wish to review. Then click submit.<br/>You can then see it under all reviews.</p>
+            <p>Fill out the form below for the movie you wish to review. Then click submit.<br/>You can then see it under See Reviews.</p>
             </Container>
             <Container >
                 <Form onSubmit={handleSubmit} >

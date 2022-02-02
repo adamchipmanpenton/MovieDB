@@ -4,12 +4,9 @@ import { Routes, Route } from "react-router-dom"
 import {Home, ViewMovies, AddReview, PageNotFound } from "./pages"
 import { useState, useEffect } from 'react';
 
-
 function App() {
   const [movies, setMovies] = useState([]);
   useEffect(() => {
-    //fetch('./movies.json')
-    //fetch('http://localhost:8000/api/movies')
     fetch('/api/movies')
       .then((response) => response.json())
       .then(setMovies)
