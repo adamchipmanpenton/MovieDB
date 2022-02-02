@@ -46,7 +46,10 @@ app.post('/api/addMovie', async (req, res) => {
 })
 
 app.post('/api/addPoster', async (req, res) => {
-    console.log("Testadd" + req)
+
+
+    console.log("Testadd" + req.body.poster)
+    
 })
 
 app.get('/api/movies', async (req, res) => {

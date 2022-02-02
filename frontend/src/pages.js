@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { useState, useEffect } from 'react';
 import './App.css';
 import {Link, useLocation} from "react-router-dom"
-import Emoji from 'a11y-react-emoji'
+import Emoji from "a11y-react-emoji"
+import axios from "axios"
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -135,17 +136,29 @@ export function ViewMovies({movies, setMovies}) {
 }
 
 export function AddReview({movies, setMovies}) {
+    const testPic = (event) =>{
+        console.log(event.target.files[0].name)
+        console.log(event.target.files[0])
+        event.preventDefault();
+    }
 
     const handleSubmit = (event) => {
-        console.log(document.getElementById("poster"))
+
+        const fd = new FormData();
+        fd.append("poster", document.getElementById("poster").files[0], document.getElementById("poster").files[0].name);
+
+        axios.post('/api/addPoster',fd)
+            .then(res=>{
+                console.log(res)
+            })
+        console.log(document.getElementById("poster").files[0].name)    
         const movieName = document.getElementById("movieName").value
         const releaseDate = document.getElementById("releaseDate").value
         const actors = document.getElementById("actors").value
         const movieRating = document.getElementById("movieRating").value
+        const posterName = document.getElementById("poster").files[0].name
         const poster = "swep4.jpg"
-        {/*event.preventDefault();*/}
         const add = async () => {
-
             const result = await  fetch('/api/addMovie',{
                 method: "POST",
                 body: JSON.stringify({name: movieName, date: releaseDate, actors: actors, poster: poster, rating: movieRating}),
@@ -210,7 +223,7 @@ export function AddReview({movies, setMovies}) {
                     </Row>
                     <Form.Group controlId="formFile" className="mb-3">
                         <Form.Label>Movie Poster</Form.Label>
-                        <Form.Control type="file" id="poster" required/>
+                        <Form.Control type="file" id="poster" onChange={testPic}/>
                     </Form.Group>
                     <Button variant="primary" type="submit" >
                         Submit
